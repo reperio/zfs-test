@@ -47,7 +47,7 @@ class ZFSApi {
 		});
 	}
 
-	send_mbuffer(snapshot_name, host, port) {
+	send_mbuffer_to_host(snapshot_name, host, port) {
 		const promise = new Promise((resolve, reject) => {
 			console.log('spawning zfs send to mbuffer');
 
