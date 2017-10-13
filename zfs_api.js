@@ -1,5 +1,6 @@
 const fs = require('fs');
 const cp = require('child_process');
+const streams = require('memory-streams');
 const spawn = cp.spawn;
 
 //process = child_process.spawn('sh', ['-c', 'unoconv -f pdf --stdout sample.doc | pdftotext -layout -enc UTF-8 - out.txt']);
@@ -30,25 +31,51 @@ class ZFSApi {
 	}
 
 	send_file(snapshot_name, file_name) {
-		const promise = new Promise((resolve, reject) => {
-			console.log('spawning zfs send to file');
+		// const promise = new Promise((resolve, reject) => {
+		// 	console.log('spawning zfs send to file');
 
-			var child = spawn('sh', ['-c', `zfs send ${snapshot_name} > ${file_name}`]);
+		// 	var child = spawn('sh', ['-c', `zfs send ${snapshot_name} > ${file_name}`]);
 			
-			child.addListener('exit', function (code) {
-				console.log(`Send complete: ${code}`);
+		// 	child.addListener('exit', function (code) {
+		// 		console.log(`Send complete: ${code}`);
 				
-				if (code === 0) {
-					resolve(code);
-				} else {
-					reject(code);
-				}
+		// 		if (code === 0) {
+		// 			resolve(code);
+		// 		} else {
+		// 			reject(code);
+		// 		}
+		// 	});
+		// });
+
+		const promise = new Promise((resolve, reject) => {
+			fs.open(file_name, 'w', 400, function (error, fd) {
+				if (error)
+					return (callback(error));
+				
+				console.log('spawning zfs send to file');
+
+				const reader = new streams.ReadableStream();
+				reader.pipe(fd);
+				//const writer = new streams.WritableStream();
+
+				const child = spawn('zfs', ['send', snapshot_name], {stdio: [-1, reader]});
+				
+				child.addListener('exit', function (code) {
+					console.log(`Send complete: ${code}`);
+					
+					if (code === 0) {
+						resolve(code);
+					} else {
+						reject(code);
+					}
+				});
 			});
 		});
 		
 		return promise;
 	}
 
+	//TODO capture stdout of zfs send as one command and pipe it into stdin of another shell command for mbuffer, so we can avoid spawning 'sh'.
 	send_mbuffer_to_host(snapshot_name, host, port) {
 		const promise = new Promise((resolve, reject) => {
 			console.log('spawning zfs send to mbuffer');
