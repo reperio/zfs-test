@@ -31,38 +31,17 @@ class ZFSApi {
 	}
 
 	send_file(snapshot_name, file_name) {
-		// const promise = new Promise((resolve, reject) => {
-		// 	console.log('spawning zfs send to file');
-
-		// 	var child = spawn('sh', ['-c', `zfs send ${snapshot_name} > ${file_name}`]);
-			
-		// 	child.addListener('exit', function (code) {
-		// 		console.log(`Send complete: ${code}`);
-				
-		// 		if (code === 0) {
-		// 			resolve(code);
-		// 		} else {
-		// 			reject(code);
-		// 		}
-		// 	});
-		// });
-
 		const promise = new Promise((resolve, reject) => {
 			console.log('spawning zfs send to file');
 
 			const file = fs.createWriteStream(file_name);
-
-			//const reader = new streams.ReadableStream();
-			const writer = new streams.WritableStream();
 			
-			//reader.pipe(writer);
 			const child = spawn('zfs', ['send', snapshot_name]);
 			
 			child.stdout.pipe(file);
 			
 			child.addListener('exit', function (code) {
 				console.log(`Send complete: ${code}`);
-				//console.log(writer.toString());
 				if (code === 0) {
 					resolve(code);
 				} else {
@@ -79,9 +58,13 @@ class ZFSApi {
 		const promise = new Promise((resolve, reject) => {
 			console.log('spawning zfs send to mbuffer');
 
-			var child = spawn('sh', ['-c', `zfs send ${snapshot_name} | mbuffer -O ${host}:${port}`]);
+			//var child = spawn('sh', ['-c', `zfs send ${snapshot_name} | mbuffer -O ${host}:${port}`]);
+			const zfs_send = spawn('zfs', ['send', snapshot_name]);
+			const mbuffer = spawn('mbuffer', ['-O', `${host}:${port}`]);
 
-			child.addListener('exit', function (code) {
+			zfs_send.stdout.pipe(mbuffer.stdin);
+
+			zfs_send.addListener('exit', function (code) {
 				console.log(`Send complete: ${code}`);
 
 				if (code === 0) {
