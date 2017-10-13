@@ -5,13 +5,13 @@ const api = new zfs_api();
 
 async function execute() {
 	try {
-		console.log('creating snapshot');
+		console.log('receiving snapshot');
 
 		await api.receive_mbuffer_to_zfs_receive('dev2/dev1', 1234);
 
-		console.log('finished creating snapshot');
+		console.log('finished receiving snapshot');
 	} catch(err) {
-		console.log('failed to create snapshot');
+		console.log('failed to receive snapshot');
 		console.log(err);
 	}
 };
