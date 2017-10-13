@@ -45,6 +45,8 @@ class ZFSApi {
 				}
 			});
 		});
+		
+		return promise;
 	}
 
 	send_mbuffer_to_host(snapshot_name, host, port) {
@@ -63,6 +65,8 @@ class ZFSApi {
 				}
 			});
 		});
+		
+		return promise;
 	}
 
 	receive_mbuffer_to_file(file_name, port) {
@@ -81,6 +85,8 @@ class ZFSApi {
 				}
 			});
 		});
+		
+		return promise;
 	}
 
 	receive_mbuffer_to_zfs_receive(receive_target, port) {
@@ -99,6 +105,8 @@ class ZFSApi {
 				}
 			});
 		});
+		
+		return promise;
 	}
 }
 
