@@ -48,27 +48,26 @@ class ZFSApi {
 		// });
 
 		const promise = new Promise((resolve, reject) => {
-			fs.open(file_name, 'w', 400, function (error, fd) {
-				if (error)
-					return (callback(error));
-				
-				console.log('spawning zfs send to file');
+			console.log('spawning zfs send to file');
 
-				const reader = new streams.ReadableStream();
-				reader.pipe(fd);
-				//const writer = new streams.WritableStream();
+			const file = fs.createWriteStream(file_name);
 
-				const child = spawn('zfs', ['send', snapshot_name], {stdio: [-1, reader]});
-				
-				child.addListener('exit', function (code) {
-					console.log(`Send complete: ${code}`);
-					
-					if (code === 0) {
-						resolve(code);
-					} else {
-						reject(code);
-					}
-				});
+			//const reader = new streams.ReadableStream();
+			const writer = new streams.WritableStream();
+			
+			//reader.pipe(writer);
+			const child = spawn('zfs', ['send', snapshot_name]);
+			
+			child.stdout.pipe(file);
+			
+			child.addListener('exit', function (code) {
+				console.log(`Send complete: ${code}`);
+				//console.log(writer.toString());
+				if (code === 0) {
+					resolve(code);
+				} else {
+					reject(code);
+				}
 			});
 		});
 		
