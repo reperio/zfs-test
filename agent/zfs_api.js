@@ -106,7 +106,7 @@ class ZFSApi {
 			const zfs_receive = spawn('zfs', ['receive', receive_target]);
 			const mbuffer = spawn('mbuffer', ['-I', port]);
 
-			mbuffer.stdout.pipe(zfs_receive);
+			mbuffer.stdout.pipe(zfs_receive.stdin);
 
 			zfs_receive.addListener('exit', function(code){
 				console.log(`Receive complete: ${code}`);
