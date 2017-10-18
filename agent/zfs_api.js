@@ -61,6 +61,9 @@ class ZFSApi {
 
 			zfs_send.stdout.pipe(mbuffer.stdin);
 
+			mbuffer.stdout.pipe(process.stdout);
+			mbuffer.stderr.pipe(process.stderr);
+
 			zfs_send.addListener('exit', function (code) {
 				console.log(`Send complete: ${code}`);
 
@@ -107,6 +110,9 @@ class ZFSApi {
 			const mbuffer = spawn('mbuffer', ['-I', port]);
 
 			mbuffer.stdout.pipe(zfs_receive.stdin);
+
+			zfs_receive.stdout.pipe(process.stdout);
+			zfs_receive.stderr.pipe(process.stderr);
 
 			zfs_receive.addListener('exit', function(code){
 				console.log(`Receive complete: ${code}`);
