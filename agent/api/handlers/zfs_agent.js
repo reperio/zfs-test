@@ -5,102 +5,139 @@ const Joi = require('joi');
 
 const zfs_api = require('../../zfs_api');
 
-const routes = [];
 
-routes.push({
-    method: ['POST'],
-    path: '/zfs/create_snapshot',
-    handler: create_snapshot,
-    config: {
-        cors: true,
-        validate: {
-            payload: {
-                snapshot_name: Joi.string().required()
+class ZFSAgentHandlers {
+    constructor(logger) {
+        this.logger = logger;
+    }
+
+    get_routes() {
+        const routes = [];
+
+        routes.push({
+            method: ['POST'],
+            path: '/zfs/create_snapshot',
+            handler: this.create_snapshot,
+            config: {
+                cors: true,
+                validate: {
+                    payload: {
+                        snapshot_name: Joi.string().required()
+                    }
+                }
             }
+        });
+
+        routes.push({
+            method: ['POST'],
+            path: '/zfs/send_snapshot',
+            handler: this.send_snapshot,
+            config: {
+                cors: true,
+                validate: {
+                    payload: {
+                        snapshot_name: Joi.string().required(),
+                        host: Joi.string().required(),
+                        port: Joi.number().required()
+                    }
+                }
+            }
+        });
+
+        routes.push({
+            method: ['POST'],
+            path: '/zfs/receive_snapshot',
+            handler: this.receive_snapshot,
+            config: {
+                cors: true,
+                validate: {
+                    payload: {
+                        target: Joi.string().required(),
+                        port: Joi.number().required()
+                    }
+                }
+            }
+        });
+
+        return routes;
+    }
+
+    async notify_server() {
+        this.logger.info('')
+    }
+    
+    async create_snapshot(request, reply) {
+        try {
+            const snapshot_name = request.payload.snapshot_name;
+
+            this.logger.info(`Creating snapshot: ${snapshot_name}`);
+
+            const api = new zfs_api();
+
+            const status_code = await api.create_snapshot(snapshot_name);
+
+            this.logger.info(`Create snapshot finished with code: ${code}`);
+            
+
+            return reply({message:'success', status_code: code});
+        }
+        catch (e) {
+            this.logger.error(e);
+
+            return reply(Boom.badImplementation('Snapshot create failed.'));
         }
     }
-});
-async function create_snapshot(request, reply) {
-    try {
-        const snapshot_name = request.payload.snapshot_name;
+    
+    async send_snapshot(request, reply) {
+        try {
+            const snapshot_name = request.payload.snapshot_name;
+            const host = request.payload.host;
+            const port = request.payload.port;
 
-        const api = new zfs_api();
+            this.logger.info(`Sending snapshot: ${snapshot_name} to ${host}:${port}`);
 
-        await api.create_snapshot(snapshot_name);
+            const api = new zfs_api();
 
-        return reply({message:'success'});
+            api.send_mbuffer_to_host(snapshot_name, host, port).then(notify_server).then(function(code) {
+                this.logger.info(`Create snapshot finished with code: ${code}`);
+            }).catch(function(code) {
+                this.logger.error(`Create snapshot finished with code: ${code}`);
+            });
+
+            this.logger.error(`Send command executed.`);
+
+            return reply({message:'success', status_code: 0});
+        }
+        catch (e) {
+            this.logger.error(e);
+
+            return reply(Boom.badImplementation('Snapshot send failed.'));
+        }
     }
-    catch (e) {
-        
+    
+    async receive_snapshot(request, reply) {
+        try {
+            const target = request.payload.target;
+            const port = request.payload.port;
 
-        return reply(Boom.badImplementation('Snapshot create failed.'));
+            this.logger.info(`Receiving snapshot: ${target} on port ${port}`);
+
+            const api = new zfs_api();
+
+            api.receive_mbuffer_to_zfs_receive(target, port).then(notify_server).then(function(code) {
+                this.logger.info(`Create snapshot finished with code: ${code}`);
+            }).catch(function(code) {
+                this.logger.error(`Create snapshot finished with code: ${code}`);
+            });
+
+            return reply({message:'success', status_code: 0});
+        }
+        catch (e) {
+            this.logger.error(e);
+
+            return reply(Boom.badImplementation('Snapshot receive failed.'));
+        }
     }
 }
 
-routes.push({
-    method: ['POST'],
-    path: '/zfs/send_snapshot',
-    handler: send_snapshot,
-    config: {
-        cors: true,
-        validate: {
-            payload: {
-                snapshot_name: Joi.string().required(),
-                host: Joi.string().required(),
-                port: Joi.number().required()
-            }
-        }
-    }
-});
-async function send_snapshot(request, reply) {
-    try {
-        const snapshot_name = request.payload.snapshot_name;
-        const host = request.payload.host;
-        const port = request.payload.port;
-
-        const api = new zfs_api();
-
-        await api.send_mbuffer_to_host(snapshot_name, host, port);
-
-        return reply({message:'success'});
-    }
-    catch (e) {
-        
-
-        return reply(Boom.badImplementation('Snapshot send failed.'));
-    }
-}
-
-routes.push({
-    method: ['POST'],
-    path: '/zfs/receive_snapshot',
-    handler: receive_snapshot,
-    config: {
-        cors: true,
-        validate: {
-            payload: {
-                target: Joi.string().required(),
-                port: Joi.number().required()
-            }
-        }
-    }
-});
-async function receive_snapshot(request, reply) {
-    try {
-        const target = request.payload.target;
-        const port = request.payload.port;
-
-        const api = new zfs_api();
-
-        await api.receive_mbuffer_to_zfs_receive(target, port);
-
-        return reply({message:'success'});
-    }
-    catch (e) {
-        
-
-        return reply(Boom.badImplementation('Snapshot receive failed.'));
-    }
-}
-
-module.exports = routes;
+module.exports = ZFSAgentHandlers;
