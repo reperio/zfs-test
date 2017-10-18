@@ -68,9 +68,9 @@ async function send_snapshot(request, reply) {
         const api = new zfs_api();
 
         api.send_mbuffer_to_host(snapshot_name, host, port).then(function(code) {
-            request.server.app.logger.info(`Create snapshot finished with code: ${code}`);
+            request.server.app.logger.info(`Send snapshot finished with code: ${code}`);
         }).catch(function(code) {
-            request.server.app.logger.error(`Create snapshot finished with code: ${code}`);
+            request.server.app.logger.error(`Send snapshot finished with code: ${code}`);
         });
 
         request.server.app.logger.info(`Send command executed.`);
@@ -108,9 +108,9 @@ async function receive_snapshot(request, reply) {
         const api = new zfs_api();
 
         api.receive_mbuffer_to_zfs_receive(target, port).then(function(code) {
-            request.server.app.logger.info(`Create snapshot finished with code: ${code}`);
+            request.server.app.logger.info(`Receive snapshot finished with code: ${code}`);
         }).catch(function(code) {
-            request.server.app.logger.error(`Create snapshot finished with code: ${code}`);
+            request.server.app.logger.error(`Receive snapshot finished with code: ${code}`);
         });
 
         return reply({message:'success', status_code: 0});
