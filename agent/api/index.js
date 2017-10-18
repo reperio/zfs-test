@@ -1,5 +1,5 @@
 'use strict';
-
+const ControllerApi = require('../controller_api');
 exports.register = function (server, options, next) {
 
     server.route({
@@ -26,7 +26,7 @@ exports.register = function (server, options, next) {
 
     server.route(require('./handlers/zfs_agent'));
 
-    server.app.zfs_controller_api = require('../controller_api')(server.app.config);
+    server.app.zfs_controller_api = new ControllerApi(server.app.config);
     
     next();
 };

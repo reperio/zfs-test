@@ -1,5 +1,6 @@
 module.exports = {
 	agent: {
+		log_directory: './logs',
 		trace_log_level: 'info',
 		app_file_log_level: 'info',
 		app_json_log_level: 'info',

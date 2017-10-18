@@ -12,11 +12,11 @@ routes.push({
     path: '/zfs/create_snapshot',
     handler: create_snapshot,
     config: {
-        cors: true
-    },
-    validate: {
-        payload: {
-            snapshot_name: Joi.string().required()
+        cors: true,
+        validate: {
+            payload: {
+                snapshot_name: Joi.string().required()
+            }
         }
     }
 });
@@ -28,7 +28,7 @@ async function create_snapshot(request, reply) {
 
         await api.create_snapshot(snapshot_name);
 
-        return reply({message:'success'}});
+        return reply({message:'success'});
     }
     catch (e) {
         
@@ -42,13 +42,13 @@ routes.push({
     path: '/zfs/send_snapshot',
     handler: send_snapshot,
     config: {
-        cors: true
-    },
-    validate: {
-        payload: {
-            snapshot_name: Joi.string().required(),
-            host: Joi.string().required(),
-            port: Joi.number().required()
+        cors: true,
+        validate: {
+            payload: {
+                snapshot_name: Joi.string().required(),
+                host: Joi.string().required(),
+                port: Joi.number().required()
+            }
         }
     }
 });
@@ -62,7 +62,7 @@ async function send_snapshot(request, reply) {
 
         await api.send_mbuffer_to_host(snapshot_name, host, port);
 
-        return reply({message:'success'}});
+        return reply({message:'success'});
     }
     catch (e) {
         
@@ -76,12 +76,12 @@ routes.push({
     path: '/zfs/receive_snapshot',
     handler: receive_snapshot,
     config: {
-        cors: true
-    },
-    validate: {
-        payload: {
-            target: Joi.string().required(),
-            port: Joi.number().required()
+        cors: true,
+        validate: {
+            payload: {
+                target: Joi.string().required(),
+                port: Joi.number().required()
+            }
         }
     }
 });
@@ -94,7 +94,7 @@ async function receive_snapshot(request, reply) {
 
         await api.receive_mbuffer_to_zfs_receive(target, port);
 
-        return reply({message:'success'}});
+        return reply({message:'success'});
     }
     catch (e) {
         

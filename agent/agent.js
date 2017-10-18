@@ -42,7 +42,7 @@ server.register({
 });
 
 //make sure unhandled exceptions are logged
-server.on('agent-error', (request, response) => {
+server.on('request-error', (request, response) => {
         request.server.app.logger.error(response);
     }
 );
@@ -77,9 +77,11 @@ server.ext({
 
 
 if (!module.parent) {
+	const log_directory = Config.agent.log_directory;
 
     const app_file_transport = new (winston.transports.DailyRotateFile)({
-        filename: './logs/log',
+    	name: 'file_transport',
+        filename: `${log_directory}/log`,
         datePattern: 'agent-app-yyyy-MM-dd.',
         prepend: true,
         level: Config.agent.app_file_log_level,
@@ -89,7 +91,8 @@ if (!module.parent) {
     });
 
     const app_json_transport = new (winston.transports.DailyRotateFile)({
-        filename: './logs/log',
+    	name: 'json_transport',
+        filename: `${log_directory}/log`,
         datePattern: 'agent-json-yyyy-MM-dd.',
         prepend: true,
         level: Config.agent.app_json_log_level,
@@ -99,7 +102,7 @@ if (!module.parent) {
     });
 
     const trace_file_transport = new (winston.transports.DailyRotateFile)({
-        filename: './logs/log',
+        filename: `${log_directory}/log`,
         datePattern: 'agent-trace-yyyy-MM-dd.',
         prepend: true,
         level: Config.agent.trace_log_level,
@@ -137,6 +140,7 @@ if (!module.parent) {
 
     server.start(err => {
         if (err) {
+        	console.log(err);
             throw err;
         }
         console.log('Server running at:', server.info.uri);
