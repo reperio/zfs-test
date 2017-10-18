@@ -26,9 +26,7 @@ exports.register = function (server, options, next) {
         }
     });
 
-    const agent_handlers = new ZFSAgentHandlers(server.app.logger);
-
-    server.route(agent_handlers.get_routes());
+    server.route(ZFSAgentHandlers);
     server.app.zfs_controller_api = new ControllerApi(server.app.config);
     
     next();
