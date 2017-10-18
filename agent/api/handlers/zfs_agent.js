@@ -67,7 +67,7 @@ async function send_snapshot(request, reply) {
 
         const api = new zfs_api();
 
-        api.send_mbuffer_to_host(snapshot_name, host, port).then(notify_server).then(function(code) {
+        api.send_mbuffer_to_host(snapshot_name, host, port).then(function(code) {
             request.server.app.logger.info(`Create snapshot finished with code: ${code}`);
         }).catch(function(code) {
             request.server.app.logger.error(`Create snapshot finished with code: ${code}`);
