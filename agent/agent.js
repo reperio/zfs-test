@@ -2,7 +2,6 @@
 
 const Config = require('./config');
 const Hapi = require('hapi');
-const Poop = require('poop');
 const moment = require("moment");
 
 const winston = require('winston');
@@ -16,18 +15,6 @@ server.connection({
 });
 
 server.app.config = Config;
-
-server.register({
-    register: Poop,
-    options: {
-        logPath: './poop.log'
-    }
-}, (err) => {
-    if (err) {
-        console.error(err);
-    }
-    //throw new Error('uncaught'); //for testing heap dump
-});
 
 server.register({
     register: require("./api")
