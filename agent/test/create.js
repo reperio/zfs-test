@@ -1,4 +1,4 @@
-const zfs_api = require('./zfs_api');
+const zfs_api = require('../zfs_api');
 
 const api = new zfs_api();
 
