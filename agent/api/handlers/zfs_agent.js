@@ -30,10 +30,10 @@ async function create_snapshot(request, reply) {
 
         const status_code = await api.create_snapshot(snapshot_name);
 
-        request.server.app.logger.info(`Create snapshot finished with code: ${code}`);
+        request.server.app.logger.info(`Create snapshot finished with code: ${status_code}`);
         
 
-        return reply({message:'success', status_code: code});
+        return reply({message:'success', status_code: status_code});
     }
     catch (e) {
         request.server.app.logger.error(e);
