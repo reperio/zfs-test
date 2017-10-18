@@ -107,7 +107,7 @@ async function receive_snapshot(request, reply) {
 
         const api = new zfs_api();
 
-        api.receive_mbuffer_to_zfs_receive(target, port).then(notify_server).then(function(code) {
+        api.receive_mbuffer_to_zfs_receive(target, port).then(function(code) {
             request.server.app.logger.info(`Create snapshot finished with code: ${code}`);
         }).catch(function(code) {
             request.server.app.logger.error(`Create snapshot finished with code: ${code}`);
