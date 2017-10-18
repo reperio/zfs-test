@@ -73,7 +73,7 @@ async function send_snapshot(request, reply) {
             request.server.app.logger.error(`Create snapshot finished with code: ${code}`);
         });
 
-        request.server.app.logger.error(`Send command executed.`);
+        request.server.app.logger.info(`Send command executed.`);
 
         return reply({message:'success', status_code: 0});
     }
