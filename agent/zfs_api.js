@@ -52,11 +52,19 @@ class ZFSApi {
 		return promise;
 	}
 
-	send_mbuffer_to_host(snapshot_name, host, port) {
+	send_mbuffer_to_host(snapshot_name, host, port, incremental, source_snapshot_name) {
 		const promise = new Promise((resolve, reject) => {
 			console.log('spawning zfs send to mbuffer');
 
-			const zfs_send = spawn('zfs', ['send', snapshot_name]);
+			const zfs_args = ['send'];
+
+			if (incremental) {
+				zfs_args.push('-I', source_snapshot_name);
+			}
+
+			zfs_args.push(snapshot_name);
+
+			const zfs_send = spawn('zfs', zfs_args);
 			const mbuffer = spawn('mbuffer', ['-O', `${host}:${port}`]);
 
 			zfs_send.stdout.pipe(mbuffer.stdin);
